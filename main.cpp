@@ -157,47 +157,54 @@ int start()
         }
     }*/
 
-    lattice[5][5].human_conc = 0;
+    lattice[5][5].human_conc = 20;
     lattice[5][5].human_threshold = 5;
-    lattice[5][5].cell_concentration = 10;
+    lattice[5][5].cell_concentration = 0;
 
     //cout << lattice[5][5].human_conc - lattice[5][5].human_threshold << endl;
 
         for (int i = 0; i < 30; i++){
-          //  cout << lattice[5][5].cell_concentration << " ";
-                //miera reprodukcie virusu v tele
-                double rate = (3 * (1 + tanh(1 * (lattice[5][5].human_conc - lattice[5][5].human_threshold))));
 
-                //bunka kontaminuje povrch tela
-                lattice[5][5].human_surface_contamination += lattice[5][5].cell_concentration * 2.3;
+              //miera reprodukcie virusu v tele
+              double rate = (3 * (1 + tanh(1 * (lattice[5][5].human_conc - lattice[5][5].human_threshold))));
 
-                //povrch tela vypusta vorus do bunky
-                lattice[5][5].cell_concentration += lattice[5][5].human_surface_contamination * 0.1;
-               // cout << lattice[5][5].cell_concentration << " ";
+              //cout << rate << endl;
+              //bunka kontaminuje povrch tela
+              lattice[5][5].human_surface_contamination = lattice[5][5].cell_concentration * 2.3;
+             // cout << lattice[5][5].human_surface_contamination << endl;
 
-            //Virus z povrchu tela sa dostava do organizmu
-                lattice[5][5].human_conc += lattice[5][5].human_surface_contamination * 1.8;
-                //cout << lattice[5][5].human_surface_contamination << endl;
-            //uvolnovanie virusu do priestoru
-                double numerator = (2 * pow(10, -4)) * (pow(lattice[5][5].human_conc, 3));
-                double denominator = (1 + (2* pow(10, -4))) * (pow(lattice[5][5].human_conc, 3));
+              //Virus z povrchu tela sa dostava do organizmu
+              lattice[5][5].human_conc += lattice[5][5].human_surface_contamination * 1.8;
 
-                double lol = numerator/denominator;
+              //reproduckia virusu v tele
+              if (lattice[5][5].human_conc > lattice[5][5].human_threshold) {
+                  lattice[5][5].human_conc = lattice[5][5].human_conc * rate * 2;
+              }
 
-                //cout << numerator << " " << denominator << endl;
-
-                lattice[5][5].cell_concentration += lattice[5][5].human_conc * ((1/6) * (1 + (numerator/denominator)));
-                cout << lattice[5][5].cell_concentration <<endl;
-
-                //reproduckia virusu v tele
-                 lattice[5][5].human_conc += (lattice[5][5].human_conc * rate) / 2;
-
-                //Znizenie koncrentracie v tele vplyvom protilatok
-                lattice[5][5].human_conc += lattice[5][5].human_conc * rc * lattice[5][5].human_antibody;
-                //Tvorba protilatok
-                lattice[5][5].human_antibody += (lattice[5][5].human_antibody*0.005)/2; //Presna hodnota niekde medzi 0 - 0.01
+              //cout << lattice[5][5].human_conc * rc * lattice[5][5].human_antibody <<endl;
+              //Znizenie koncrentracie v tele vplyvom protilatok
+              lattice[5][5].human_conc -= lattice[5][5].human_conc * rc * lattice[5][5].human_antibody;
+              //Tvorba protilatok
+              lattice[5][5].human_antibody = lattice[5][5].human_antibody * 2 * 0.01 ; //Presna hodnota niekde medzi 0 - 0.01
 
 
+               //cout << lattice[5][5].cell_concentration <<endl;
+               //degradacia virusu v bunke - ZMENA ZA INTERVAL delta T
+               double koeficient_difuzie = 2.5 * pow(10, -5);
+               double suma = lattice[5+1][5].cell_concentration + lattice[5-1][5].cell_concentration + lattice[5][5+1].cell_concentration + lattice[5][5-1].cell_concentration;
+               double zatvorka = koeficient_difuzie * (suma - (4 * lattice[5][5].cell_concentration));
+               double konecna_zmena = zatvorka - lattice[5][5].cell_concentration;
+
+              /* cout << lattice[5][5].cell_concentration << " ";
+               cout <<konecna_zmena <<endl;*/
+
+               lattice[5][5].cell_concentration += konecna_zmena;
+
+               //if (lattice[5][5].cell_concentration < 0) {lattice[5][5].cell_concentration = 0;}
+
+                /*cout << lattice[5][5].human_surface_contamination<< " ";
+                cout << lattice[5][5].cell_concentration<< " ";
+                cout << lattice[5][5].human_conc << endl;*/
         }
 
 
