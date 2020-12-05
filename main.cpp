@@ -29,7 +29,7 @@ typedef struct {
 vector<vector<cell>> lattice;
 
 //koeficient ubytku virusu v tele za pomoci protilatok, BUDE SA MENIT
-double rc = 0.1;
+double rc = 1;
 
 /*int calculateChange(int height, int width) {
     for (int x; x < height; x++) {
@@ -81,7 +81,7 @@ int start()
             lattice[x][y].human_conc = 0;
             lattice[x][y].cell_concentration = 0;
             lattice[x][y].human_surface_contamination = 0;
-            lattice[x][y].human_antibody = 0.5;
+            lattice[x][y].human_antibody = 0.1;
         }
     }
 
@@ -102,8 +102,8 @@ int start()
     for (int x = 0; x < height; x++){
         for (int y = 0; y < width; y++) {
             if (lattice[x][y].occupied == true) {
-                lattice[x][y].human_tolerance = tolerance_distribution();
-                lattice[x][y].human_threshold = threshold_distribution();
+                lattice[x][y].human_tolerance = tolerance_distribution() * pow(10, 4);
+                lattice[x][y].human_threshold = threshold_distribution() * pow(10, 4);
                 confirm++;
             }
         }
@@ -125,25 +125,29 @@ int start()
     }
 
     //Reprodukcia virusu v tele
-    for (int x = 0; x < height; x++){
+  /*  for (int x = 0; x < height; x++){
         for (int y = 0; y < width; y++) {
             if (lattice[x][y].occupied == true && lattice[x][y].human_conc > 0){
-                //uvolnovanie virusu do priestoru
-                lattice[x][y].human_conc += (lattice[x][y].human_conc) * (3 * (1 + tanh(1 * (lattice[x][y].human_conc - lattice[x][y].human_threshold))));
                 //reprodukcia virusu v tele
-                double numerator = 2 * pow(10, -4) * pow(lattice[x][y].human_conc, 3);
-                double denominator = 1 + 2 * pow(10, -4) * pow(lattice[x][y].human_conc, 3);
-                lattice[x][y].cell_concentration += lattice[x][y].human_conc * ((1/6.28) * (1 + numerator/denominator));
+                double rate = (3 * (1 + tanh(1 * (lattice[0][0].human_conc - lattice[0][0].human_threshold))));
+                lattice[0][0].human_conc = lattice[0][0].human_conc * rate;
+
+                //uvolnovanie virusu do priestoru
+                double numerator = 2 * pow(10, -4) * pow(lattice[0][0].human_conc, 3);
+                double denominator = 1 + 2 * pow(10, -4) * pow(lattice[0][0].human_conc, 3);
+                double okolie = ((1/6.28) * (1 + numerator/denominator));
+                lattice[0][0].cell_concentration += okolie;
                 //Znizenie koncrentracie v tele vplyvom protilatok
-                lattice[x][y].human_conc -= lattice[x][y].human_conc * (rc * lattice[x][y].human_antibody);
+                lattice[0][0].human_conc -= (rc * lattice[0][0].human_antibody);
                 //Tvorba protilatok
-                lattice[x][y].human_antibody += lattice[x][y].human_antibody * 0.005; //Presna hodnota niekde medzi 0 - 0.01
+                lattice[0][0].human_antibody += lattice[0][0].human_antibody * 0.005 * pow(10, 4); //Presna hodnota niekde medzi 0 - 0.01
+
             }
         }
-    }
+    }*/
 
     //Kontaminacia bloku uvolnovanim virusu z tela
-    for (int x = 0; x < height; x++){
+  /*  for (int x = 0; x < height; x++){
         for (int y = 0; y < width; y++) {
             if (lattice[x][y].occupied == true){
                 double numerator = 2 * pow(10, -4) * pow(lattice[x][y].human_conc, 3);
@@ -151,39 +155,57 @@ int start()
                 lattice[x][y].cell_concentration += lattice[x][y].human_conc * ((1/6.28) * (1 + numerator/denominator));
             }
         }
-    }
+    }*/
 
+    lattice[5][5].human_conc = 0;
+    lattice[5][5].human_threshold = 5;
+    lattice[5][5].cell_concentration = 10;
 
+    //cout << lattice[5][5].human_conc - lattice[5][5].human_threshold << endl;
 
-// testovanie a vypis vysledkov konkretnej implementacie na bloku [0, 0]
+        for (int i = 0; i < 30; i++){
+          //  cout << lattice[5][5].cell_concentration << " ";
+                //miera reprodukcie virusu v tele
+                double rate = (3 * (1 + tanh(1 * (lattice[5][5].human_conc - lattice[5][5].human_threshold))));
 
-    lattice[0][0].human_conc = 2;
-    lattice[0][0].human_threshold = 5;
+                //bunka kontaminuje povrch tela
+                lattice[5][5].human_surface_contamination += lattice[5][5].cell_concentration * 2.3;
 
-    for (int i = 0; i < 50; i++) {
-        if (lattice[0][0].occupied == true && lattice[0][0].human_conc > 0) {
+                //povrch tela vypusta vorus do bunky
+                lattice[5][5].cell_concentration += lattice[5][5].human_surface_contamination * 0.1;
+               // cout << lattice[5][5].cell_concentration << " ";
+
+            //Virus z povrchu tela sa dostava do organizmu
+                lattice[5][5].human_conc += lattice[5][5].human_surface_contamination * 1.8;
+                //cout << lattice[5][5].human_surface_contamination << endl;
             //uvolnovanie virusu do priestoru
-            lattice[0][0].human_conc += (lattice[0][0].human_conc) * (3 * (1 + tanh(1 * (lattice[0][0].human_conc -
-                                                                                         lattice[0][0].human_threshold))));
-            //reprodukcia virusu v tele
-            double numerator = 2 * pow(10, -4) * pow(lattice[0][0].human_conc, 3);
-            double denominator = 1 + 2 * pow(10, -4) * pow(lattice[0][0].human_conc, 3);
-            lattice[0][0].cell_concentration += lattice[0][0].human_conc * ((1 / 6.28) * (1 + numerator / denominator));
-            //Znizenie koncrentracie v tele vplyvom protilatok
-            lattice[0][0].human_conc -= lattice[0][0].human_conc * (rc * lattice[0][0].human_antibody);
-            //Tvorba protilatok
-            lattice[0][0].human_antibody += lattice[0][0].human_antibody * 0.005; //Presna hodnota niekde medzi 0 - 0.01
+                double numerator = (2 * pow(10, -4)) * (pow(lattice[5][5].human_conc, 3));
+                double denominator = (1 + (2* pow(10, -4))) * (pow(lattice[5][5].human_conc, 3));
 
-            cout << "Kontaminacia bloku je " << lattice[0][0].human_conc << endl;
+                double lol = numerator/denominator;
+
+                //cout << numerator << " " << denominator << endl;
+
+                lattice[5][5].cell_concentration += lattice[5][5].human_conc * ((1/6) * (1 + (numerator/denominator)));
+                cout << lattice[5][5].cell_concentration <<endl;
+
+                //reproduckia virusu v tele
+                 lattice[5][5].human_conc += (lattice[5][5].human_conc * rate) / 2;
+
+                //Znizenie koncrentracie v tele vplyvom protilatok
+                lattice[5][5].human_conc += lattice[5][5].human_conc * rc * lattice[5][5].human_antibody;
+                //Tvorba protilatok
+                lattice[5][5].human_antibody += (lattice[5][5].human_antibody*0.005)/2; //Presna hodnota niekde medzi 0 - 0.01
+
 
         }
-    }
 
 
 
 
 
-    //
+
+
     //vypis hodnot
     for (int x = 0; x < height; x++){
         for (int y = 0; y < width; y++) {
