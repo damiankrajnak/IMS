@@ -7,7 +7,6 @@
 using namespace std;
 
 typedef struct {
-    int population;
     int state;
     int sus;
     int next_state;
@@ -15,16 +14,15 @@ typedef struct {
 } cell;
 //glob premenna
 vector<vector<cell>> lattice;
-int height = 10;
-int width = 10;
-int starting_infected = 1;
+int priemer[16];
+int height = 61;
+int width = 61;
+int starting_infected = 10;
 
 int start()
 {
     int sus_again = 10;
-    double p_infect = 0;
-    double p_recover = 0;
-    double p = 0.005;
+    double p = 0.017;
     double q = 0.0;
     int num_infected = starting_infected;
     int num_recovered = 0;
@@ -38,7 +36,7 @@ int start()
         }
         }*/
 
-    for (int t = 0; t < 24; t++) {
+    for (int t = 0; t < 16; t++) {
         for (int x = 0; x < height; x++) {
             for (int y = 0; y < width; y++) {
 
@@ -145,6 +143,8 @@ int start()
         cout << num_infected << " ";
         cout << num_recovered << endl;
 
+        priemer[t] += num_infected;
+
         num_infected = 0;
         num_recovered = 0;
         num_susceptible = 0;
@@ -178,7 +178,6 @@ int set_lattice() {
     //nastevene buniek
     for (int x = 0; x < height; x++) {
         for (int y = 0; y < width; y++) {
-            lattice[x][y].population = 100;
             lattice[x][y].state = SUSCEPTIBLE;
             lattice[x][y].next_state = SUSCEPTIBLE;
             lattice[x][y].sus = 0;
