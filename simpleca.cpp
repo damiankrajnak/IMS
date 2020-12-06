@@ -15,16 +15,16 @@ typedef struct {
 } cell;
 //glob premenna
 vector<vector<cell>> lattice;
-int height = 150;
-int width = 150;
-int starting_infected = 2;
+int height = 10;
+int width = 10;
+int starting_infected = 1;
 
 int start()
 {
-    int sus_again = 5;
+    int sus_again = 10;
     double p_infect = 0;
     double p_recover = 0;
-    double p = 0.2;
+    double p = 0.005;
     double q = 0.0;
     int num_infected = starting_infected;
     int num_recovered = 0;
@@ -38,7 +38,7 @@ int start()
         }
         }*/
 
-    for (int t = 0; t < 100; t++) {
+    for (int t = 0; t < 24; t++) {
         for (int x = 0; x < height; x++) {
             for (int y = 0; y < width; y++) {
 
@@ -60,7 +60,7 @@ int start()
                                 lattice[x + 1][y + 1].next_state = INFECTED;
                                 lattice[x][y].next_state = INFECTED;
                             }
-                            } else if ( x < height - 1 && y < width - 1 && lattice[x + 1][y + 1].next_state != INFECTED) {
+                            } else if ( x < height - 1 && y < width - 1 && lattice[x + 1][y + 1].state == SUSCEPTIBLE) {
                             lattice[x + 1][y + 1].next_state = SUSCEPTIBLE;
                         }
 
@@ -69,7 +69,7 @@ int start()
                                 lattice[x][y + 1].next_state = INFECTED;
                                 lattice[x][y].next_state = INFECTED;
                             }
-                            } else if (y < width - 1 && lattice[x][y + 1].next_state != INFECTED ) {
+                            } else if (y < width - 1 && lattice[x][y + 1].state == SUSCEPTIBLE) {
                             lattice[x][y + 1].next_state = SUSCEPTIBLE;
                         }
 
@@ -78,7 +78,7 @@ int start()
                                 lattice[x - 1][y + 1].next_state = INFECTED;
                                 lattice[x][y].next_state = INFECTED;
                             }
-                            } else if (x > 0 && y < width - 1 && lattice[x - 1][y + 1].next_state != INFECTED ) {
+                            } else if (x > 0 && y < width - 1 && lattice[x - 1][y + 1].state == SUSCEPTIBLE) {
                             lattice[x - 1][y + 1].next_state = SUSCEPTIBLE;
                         }
 
@@ -88,7 +88,7 @@ int start()
                                 lattice[x - 1][y].next_state = INFECTED;
                                 lattice[x][y].next_state = INFECTED;
                             }
-                            } else if (x > 0 && lattice[x - 1][y].next_state != INFECTED){
+                            } else if (x > 0 && lattice[x - 1][y].state == SUSCEPTIBLE){
                             lattice[x - 1][y].next_state = SUSCEPTIBLE;
                         }
 
@@ -97,7 +97,7 @@ int start()
                                 lattice[x - 1][y - 1].next_state = INFECTED;
                                 lattice[x][y].next_state = INFECTED;
                             }
-                            } else if (x > 0 && y > 0 && lattice[x - 1][y - 1].next_state != INFECTED){
+                            } else if (x > 0 && y > 0 && lattice[x - 1][y - 1].state == SUSCEPTIBLE){
                             lattice[x - 1][y - 1].next_state = SUSCEPTIBLE;
                         }
 
@@ -106,7 +106,7 @@ int start()
                                 lattice[x][y - 1].next_state = INFECTED;
                                 lattice[x][y].next_state = INFECTED;
                             }
-                        } else if (y > 0 && lattice[x][y - 1].next_state != INFECTED){
+                        } else if (y > 0 && lattice[x][y - 1].state == SUSCEPTIBLE){
                             lattice[x][y - 1].next_state = SUSCEPTIBLE;
                         }
 
@@ -115,7 +115,7 @@ int start()
                                 lattice[x + 1][y - 1].next_state = INFECTED;
                                 lattice[x][y].next_state = INFECTED;
                             }
-                        } else if (x < height - 1 & y > 0 && lattice[x + 1][y - 1].next_state != INFECTED){
+                        } else if (x < height - 1 & y > 0 && lattice[x + 1][y - 1].state == SUSCEPTIBLE){
                             lattice[x + 1][y - 1].next_state = SUSCEPTIBLE;
                         }
 
@@ -124,7 +124,7 @@ int start()
                                 lattice[x + 1][y].next_state = INFECTED;
                                 lattice[x][y].next_state = INFECTED;
                             }
-                        } else if (x < height - 1 && lattice[x + 1][y].next_state != INFECTED){
+                        } else if (x < height - 1 && lattice[x + 1][y].state == SUSCEPTIBLE){
                             lattice[x + 1][y].next_state = SUSCEPTIBLE;
                         }
                     }
@@ -181,6 +181,7 @@ int set_lattice() {
             lattice[x][y].population = 100;
             lattice[x][y].state = SUSCEPTIBLE;
             lattice[x][y].next_state = SUSCEPTIBLE;
+            lattice[x][y].sus = 0;
         }
     }
     //vyber nahodne vybranej infikovanej populacie
