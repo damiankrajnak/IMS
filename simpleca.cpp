@@ -15,16 +15,16 @@ typedef struct {
 } cell;
 //glob premenna
 vector<vector<cell>> lattice;
-int height = 5;
-int width = 5;
-int starting_infected = 1;
+int height = 150;
+int width = 150;
+int starting_infected = 2;
 
 int start()
 {
     int sus_again = 5;
     double p_infect = 0;
     double p_recover = 0;
-    double p = 1;
+    double p = 0.2;
     double q = 0.0;
     int num_infected = starting_infected;
     int num_recovered = 0;
@@ -42,41 +42,44 @@ int start()
         for (int x = 0; x < height; x++) {
             for (int y = 0; y < width; y++) {
 
-                if (lattice[x][y].state == SUSCEPTIBLE && lattice[x][y].next_state == SUSCEPTIBLE) {
+                /*if (lattice[x][y].state == SUSCEPTIBLE && lattice[x][y].next_state == SUSCEPTIBLE) {
                     lattice[x][y].next_state = SUSCEPTIBLE;
-                }
+                }*/
 
-                //cout << "TIME " << t << " " << lattice[x][y].state << " " << x << " " << y <<endl;
+               // cout << "TIME " << t << " " << lattice[x][y].state << " " << x << " " << y <<endl;
+
                 if (lattice[x][y].state == INFECTED) {
+
                     if ((double) rand() / RAND_MAX < q) {
                         lattice[x][y].next_state = RECOVERED;
+
                     } else {
 
                         if (((double) rand() / RAND_MAX < (1 - pow((1 - p), 9))) && x < height - 1 && y < width - 1) {
                             if (lattice[x + 1][y + 1].state == SUSCEPTIBLE) {
                                 lattice[x + 1][y + 1].next_state = INFECTED;
                                 lattice[x][y].next_state = INFECTED;
-                            } else {
-                                lattice[x + 1][y + 1].next_state = SUSCEPTIBLE;
                             }
+                            } else if ( x < height - 1 && y < width - 1 && lattice[x + 1][y + 1].next_state != INFECTED) {
+                            lattice[x + 1][y + 1].next_state = SUSCEPTIBLE;
                         }
 
                         if (((double) rand() / RAND_MAX < (1 - pow((1 - p), 9))) && y < width - 1) {
                             if (lattice[x][y + 1].state == SUSCEPTIBLE) {
                                 lattice[x][y + 1].next_state = INFECTED;
                                 lattice[x][y].next_state = INFECTED;
-                            } else {
-                                lattice[x][y + 1].next_state = SUSCEPTIBLE;
                             }
+                            } else if (y < width - 1 && lattice[x][y + 1].next_state != INFECTED ) {
+                            lattice[x][y + 1].next_state = SUSCEPTIBLE;
                         }
 
                         if (((double) rand() / RAND_MAX < (1 - pow((1 - p), 9))) && x > 0 && y < width - 1) {
                             if (lattice[x - 1][y + 1].state == SUSCEPTIBLE) {
                                 lattice[x - 1][y + 1].next_state = INFECTED;
                                 lattice[x][y].next_state = INFECTED;
-                            } else {
-                                lattice[x - 1][y + 1].next_state = SUSCEPTIBLE;
                             }
+                            } else if (x > 0 && y < width - 1 && lattice[x - 1][y + 1].next_state != INFECTED ) {
+                            lattice[x - 1][y + 1].next_state = SUSCEPTIBLE;
                         }
 
 
@@ -84,18 +87,18 @@ int start()
                             if (lattice[x - 1][y].state == SUSCEPTIBLE) {
                                 lattice[x - 1][y].next_state = INFECTED;
                                 lattice[x][y].next_state = INFECTED;
-                            } else {
-                                lattice[x - 1][y].next_state = SUSCEPTIBLE;
                             }
+                            } else if (x > 0 && lattice[x - 1][y].next_state != INFECTED){
+                            lattice[x - 1][y].next_state = SUSCEPTIBLE;
                         }
 
                         if (((double) rand() / RAND_MAX < (1 - pow((1 - p), 9))) && x > 0 && y > 0) {
                             if (lattice[x - 1][y - 1].state == SUSCEPTIBLE) {
                                 lattice[x - 1][y - 1].next_state = INFECTED;
                                 lattice[x][y].next_state = INFECTED;
-                            } else {
-                                lattice[x - 1][y - 1].next_state = SUSCEPTIBLE;
                             }
+                            } else if (x > 0 && y > 0 && lattice[x - 1][y - 1].next_state != INFECTED){
+                            lattice[x - 1][y - 1].next_state = SUSCEPTIBLE;
                         }
 
                         if (((double) rand() / RAND_MAX < (1 - pow((1 - p), 9))) && y > 0) {
@@ -103,27 +106,26 @@ int start()
                                 lattice[x][y - 1].next_state = INFECTED;
                                 lattice[x][y].next_state = INFECTED;
                             }
-                        } else {
+                        } else if (y > 0 && lattice[x][y - 1].next_state != INFECTED){
                             lattice[x][y - 1].next_state = SUSCEPTIBLE;
                         }
-
 
                         if (((double) rand() / RAND_MAX < (1 - pow((1 - p), 9))) && x < height - 1 & y > 0) {
                             if (lattice[x + 1][y - 1].state == SUSCEPTIBLE) {
                                 lattice[x + 1][y - 1].next_state = INFECTED;
                                 lattice[x][y].next_state = INFECTED;
-                            } else {
-                                lattice[x + 1][y - 1].next_state = SUSCEPTIBLE;
                             }
+                        } else if (x < height - 1 & y > 0 && lattice[x + 1][y - 1].next_state != INFECTED){
+                            lattice[x + 1][y - 1].next_state = SUSCEPTIBLE;
                         }
 
                         if (((double) rand() / RAND_MAX < (1 - pow((1 - p), 9))) && x < height - 1) {
                             if (lattice[x + 1][y].state == SUSCEPTIBLE) {
                                 lattice[x + 1][y].next_state = INFECTED;
                                 lattice[x][y].next_state = INFECTED;
-                            } else {
-                                lattice[x + 1][y].next_state = SUSCEPTIBLE;
                             }
+                        } else if (x < height - 1 && lattice[x + 1][y].next_state != INFECTED){
+                            lattice[x + 1][y].next_state = SUSCEPTIBLE;
                         }
                     }
                 }
